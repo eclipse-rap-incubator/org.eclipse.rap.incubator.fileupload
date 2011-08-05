@@ -170,7 +170,7 @@ public class FileUploadHandler_Test extends TestCase {
 
   public void testUploadWithException() throws Exception {
     FileUploadReceiver receiver = new FileUploadReceiver() {
-      public void receive( InputStream dataStream ) throws IOException {
+      public void receive( InputStream dataStream, IFileUploadDetails details ) throws IOException {
         throw new IOException( "the error message" );
       }
     };

@@ -21,11 +21,13 @@ import java.io.OutputStream;
  * A file upload receiver that stores received files on disk.
  */
 public class DiskFileUploadReceiver extends FileUploadReceiver {
+  
+  private static final String DEFAULT_TARGET_FILE_NAME = "upload.tmp";
 
   private File targetFile;
 
-  public void receive( InputStream dataStream ) throws IOException {
-    File targetFile = createTargetFile();
+  public void receive( InputStream dataStream, IFileUploadDetails details ) throws IOException {
+    File targetFile = createTargetFile( details );
     FileOutputStream outputStream = new FileOutputStream( targetFile );
     try {
       copy( dataStream, outputStream );
@@ -47,10 +49,25 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
   /**
    * Creates a file to save the received data to. Subclasses may override.
    *
+   * @param details the details of the uploaded file like file name, content-type and size
    * @return the file to store the data in
    */
-  protected File createTargetFile() throws IOException {
-    return File.createTempFile( "upload.", ".tmp" );
+  protected File createTargetFile( IFileUploadDetails details ) throws IOException {
+    String fileName = DEFAULT_TARGET_FILE_NAME;
+    if( details != null && details.getFileName() != null ) {
+      fileName = details.getFileName();
+    }
+    return File.createTempFile( createPrefix( fileName ), createSuffix( fileName ) );
+  }
+
+  private String createPrefix( String fileName ) {
+    int dotIndex = fileName.lastIndexOf( '.' );
+    return dotIndex == -1 ? fileName : fileName.substring( 0, dotIndex + 1 );
+  }
+
+  private String createSuffix( String fileName ) {
+    int dotIndex = fileName.lastIndexOf( '.' );
+    return dotIndex == -1 ? null : fileName.substring( dotIndex );
   }
 
   private static void copy( InputStream inputStream, OutputStream outputStream )
