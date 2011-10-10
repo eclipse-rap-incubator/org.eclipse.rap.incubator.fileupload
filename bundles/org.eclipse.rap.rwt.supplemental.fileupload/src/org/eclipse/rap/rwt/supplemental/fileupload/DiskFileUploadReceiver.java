@@ -21,8 +21,9 @@ import java.io.OutputStream;
  * A file upload receiver that stores received files on disk.
  */
 public class DiskFileUploadReceiver extends FileUploadReceiver {
-  
+
   private static final String DEFAULT_TARGET_FILE_NAME = "upload.tmp";
+  private static final String TEMP_DIRECTORY_PREFIX = "fileupload_";
 
   private File targetFile;
 
@@ -57,17 +58,20 @@ public class DiskFileUploadReceiver extends FileUploadReceiver {
     if( details != null && details.getFileName() != null ) {
       fileName = details.getFileName();
     }
-    return File.createTempFile( createPrefix( fileName ), createSuffix( fileName ) );
+    File result = new File( createTempDirectory(), fileName );
+    result.createNewFile();
+    return result;
   }
 
-  private String createPrefix( String fileName ) {
-    int dotIndex = fileName.lastIndexOf( '.' );
-    return dotIndex == -1 ? fileName : fileName.substring( 0, dotIndex + 1 );
-  }
-
-  private String createSuffix( String fileName ) {
-    int dotIndex = fileName.lastIndexOf( '.' );
-    return dotIndex == -1 ? null : fileName.substring( dotIndex );
+  private static File createTempDirectory() throws IOException {
+    File result = File.createTempFile( TEMP_DIRECTORY_PREFIX, "" );
+    result.delete();
+    if( result.mkdir() ) {
+      result.deleteOnExit();
+    } else {
+      throw new IOException( "Unable to create temp directory: " + result.getAbsolutePath() );
+    }
+    return result;
   }
 
   private static void copy( InputStream inputStream, OutputStream outputStream )
