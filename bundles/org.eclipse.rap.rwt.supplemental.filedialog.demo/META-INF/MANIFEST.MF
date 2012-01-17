@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: %Bundle-Name
-Bundle-Version: 1.4.1.qualifier
+Bundle-Version: 1.4.2.qualifier
 Bundle-SymbolicName: org.eclipse.rap.rwt.supplemental.filedialog.demo;singleton:=true
 Bundle-RequiredExecutionEnvironment: J2SE-1.4
 Import-Package: javax.servlet;version="2.5.0",
